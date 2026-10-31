@@ -1,0 +1,12 @@
+# data: keep code (data/ingest, data/preprocessing), ignore the data itself
+data/raw/
+data/ref/
+data/processed/
+data/samples/
+
+.venv/
+__pycache__/
+config.local.json
+
+# private planning notes
+.doc/

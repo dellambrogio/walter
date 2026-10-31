@@ -1,0 +1,5 @@
+# Type checking for the data scripts and config.py (`just typecheck`). The backend has its own
+# [tool.pyrefly] in app/backend/pyproject.toml and is checked inside the API container.
+project-includes = ["config.py", "data/**/*.py"]
+python-interpreter-path = ".venv/bin/python"
+search-path = ["."]

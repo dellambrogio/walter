@@ -1,0 +1,29 @@
+# Production-style override, used by `just deploy`:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Same project and database as dev; replaces the dev api/web containers.
+services:
+  api:
+    volumes: !override
+      - ../../config.local.json:/config/config.local.json:ro
+    command: !reset null
+    restart: unless-stopped
+
+  tiles:
+    restart: unless-stopped
+
+  db:
+    restart: unless-stopped
+
+  web:
+    image: !reset null
+    build: ../frontend
+    working_dir: !reset null
+    environment: !reset {}
+    volumes: !reset []
+    command: !reset null
+    ports: !override
+      - "127.0.0.1:8080:80"
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy

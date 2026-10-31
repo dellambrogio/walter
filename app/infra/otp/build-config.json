@@ -1,0 +1,8 @@
+{
+  "transitServiceStart": "2026-07-10",
+  "transitServiceEnd": "2026-07-13",
+  "transitFeeds": [{ "type": "gtfs", "source": "gtfs.zip", "feedId": "ch" }],
+  "osm": [{ "source": "switzerland.osm.pbf" }],
+  "areaVisibility": false,
+  "embedRouterConfig": true
+}

@@ -1,0 +1,15 @@
+{
+  "travel": {
+    "days": [
+      "saturday",
+      "sunday"
+    ],
+    "departure": "08:00",
+    "mode": "public_transport",
+    "from_station": {
+      "name": "Zürich HB",
+      "lon": 8.54021,
+      "lat": 47.37818
+    }
+  }
+}

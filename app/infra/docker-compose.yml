@@ -1,0 +1,86 @@
+name: walter
+
+services:
+  db:
+    build: db
+    environment:
+      POSTGRES_USER: walter
+      POSTGRES_PASSWORD: walter
+      POSTGRES_DB: walter
+    volumes:
+      - db-data:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U walter -d walter"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: ../backend
+    environment:
+      WALTER_DATABASE_URL: postgresql+psycopg://walter:walter@db:5432/walter
+    volumes:
+      - ../backend:/app
+      - ../../config.local.json:/config/config.local.json:ro
+    command: sh -c "alembic upgrade head && uvicorn walter.main:app --host 0.0.0.0 --port 8000 --reload"
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    depends_on:
+      db:
+        condition: service_healthy
+
+  tiles:
+    image: ghcr.io/maplibre/martin:1.16.1
+    environment:
+      DATABASE_URL: postgresql://walter:walter@db:5432/walter
+    volumes:
+      - ./martin.yaml:/config/martin.yaml:ro
+    command: ["--config", "/config/martin.yaml"]
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    image: node:24-alpine
+    working_dir: /app
+    environment:
+      API_PROXY_TARGET: http://api:8000
+      TILES_PROXY_TARGET: http://tiles:3000
+    volumes:
+      - ../frontend:/app
+      - web-node-modules:/app/node_modules
+    command: sh -c "npm ci --no-fund --no-audit && npm run dev"
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      - api
+
+  # Public transport router, only for computing travel times (`just otp-build`, `just otp`)
+  otp:
+    image: opentripplanner/opentripplanner:2.10.0
+    profiles: [otp]
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx${OTP_HEAP:-5g}
+    # Hard cap: if OTP runs out of memory Docker kills it, instead of the laptop swapping to death.
+    # Keep it below the RAM that's actually free (e.g. OTP_HEAP=4500m OTP_MEM=5500m just otp)
+    mem_limit: ${OTP_MEM:-7g}
+    memswap_limit: ${OTP_MEM:-7g}
+    volumes:
+      - ../../data/ref/otp/graph:/var/opentripplanner
+    command: ["--load", "--serve"]
+    ports:
+      - "127.0.0.1:8090:8080"
+
+volumes:
+  db-data:
+  web-node-modules:

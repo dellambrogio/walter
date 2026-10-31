@@ -1,0 +1,7 @@
+# Lint for the data scripts and config.py (`just lint`); the backend has its own settings in
+# app/backend/pyproject.toml, which ruff picks up for files there.
+line-length = 110
+target-version = "py313"
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "ANN"]  # ANN: every function annotated (checked by pyrefly)

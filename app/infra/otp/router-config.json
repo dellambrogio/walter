@@ -1,0 +1,4 @@
+{
+  "server": { "apiProcessingTimeout": "20s" },
+  "routingDefaults": { "searchWindow": "2h" }
+}

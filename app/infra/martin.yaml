@@ -1,0 +1,27 @@
+# Explicit allow-list: only public Swiss data is published as tiles. Personal tables (e.g. my_hike,
+# from the Google Timeline) must never be added here; they are served by the API instead.
+postgres:
+  connection_string: ${DATABASE_URL}
+  auto_publish: false
+  tables:
+    sm_stage:
+      schema: public
+      table: sm_stage
+      srid: 2056
+      geometry_column: geom
+      geometry_type: LINESTRING
+      properties:
+        id: varchar
+        route_nr: varchar
+        nr: int4
+        level: varchar
+        route_name: varchar
+        from_name: varchar
+        to_name: varchar
+        km: int4
+        ascent: int4
+        descent: int4
+        time_h: float8
+        time_back_h: float8
+        fitness: varchar
+        technique: varchar
